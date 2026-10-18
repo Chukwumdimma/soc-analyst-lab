@@ -47,6 +47,15 @@ Wireshark showed WireGuard (a VPN) over UDP. The client's first packet went to d
 
 
 ## Problems and how I fixed them
+### 1. Which page did the user log in to?
+- **Problem:** I answered with `/doLogin`, which was marked wrong.
+- **Fix:** `/doLogin` is where the form was submitted. The question wanted the page with the login form, and the Referer header showed it was `http://testfire.net/login.jsp`.
+- **Lesson:** Read the question for which page it means. A Referer header shows where a request came from.
 
+### 2. Finding the secure UDP protocol
+- **Problem:** The `udp` filter showed SSDP, DNS, MDNS and LLMNR. None of them is secure, and all were marked wrong.
+- **Fix:** I filtered those four out, which left WireGuard.
+- **Lesson:** Filter out the noise you've already ruled out instead of guessing names.
 
 ## What I learned
+
