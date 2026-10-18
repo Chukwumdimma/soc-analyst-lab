@@ -58,4 +58,7 @@ Wireshark showed WireGuard (a VPN) over UDP. The client's first packet went to d
 - **Lesson:** Filter out the noise you've already ruled out instead of guessing names.
 
 ## What I learned
-
+- HTTP sends everything readable. One POST packet gave me the username and password, with no cracking needed. HTTPS or a VPN would have hidden it.
+- Following the TCP stream shows the whole conversation, including headers I'd have missed in the packet list. A 302 redirect doesn't prove a login worked, so I read the Location line and noted the limits.
+- Secure traffic is just as visible in a capture. I could tell WireGuard and TLS were running without reading what was inside them.
+- A hash on the capture file means anyone can confirm it's the same evidence.
