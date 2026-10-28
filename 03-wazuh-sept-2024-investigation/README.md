@@ -13,11 +13,11 @@ I was given access to a practice Wazuh instance and no questions, so I chose my 
 ## What I did
 1. Filtered the Events view to September 2024 and found 2,642 alerts.
 
-![September 2024 alerts, filtered by date](wz02-september-alerts.png)
+![September 2024 alerts, filtered by date](screenshots/wz02-september-alerts.png)
 
 2. Filtered to level 12 and above with `rule.level >= 12`, which left 41 alerts.
 
-![Alerts at level 12 and above](wz03-level12-alerts.png)
+![Alerts at level 12 and above](screenshots/wz03-level12-alerts.png)
 
 3. Grouped those 41 by rule description: 32 "executable file dropped", 7 CVE alerts, 1 PowerShell alert and 1 "Administrators group changed".
 4. Opened the Administrators alert (Event ID 4732) and searched `data.win.system.eventID: 4720` to find the account creation.
