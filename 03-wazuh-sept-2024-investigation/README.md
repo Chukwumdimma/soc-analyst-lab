@@ -27,7 +27,33 @@ I was given access to a practice Wazuh instance and no questions, so I chose my 
 8. Searched `rule.groups: authentication_success` and checked the logon types.
 
 ## What I found
----
+
+### 1. Five simulated attacker actions in about 11 seconds
+The Sysmon process events showed what ran on the Windows host:
+
+| Time | What it did |
+|---|---|
+| 21:59:30 | PowerShell downloaded a phishing-attachment test file from the Atomic Red Team GitHub repository into Temp |
+| 21:59:32 | `net user` created the account `art-test`, set its password, and `net localgroup` added it to Administrators |
+| 21:59:36 | PowerShell stored an encoded payload in a registry key and ran it, which writes a marker file |
+| 21:59:38 | `reg add` created a Run key value so a program starts at logon |
+| 21:59:41 | PowerShell copied `batstartup.bat` into the all-users Startup folder |
+
+![Sysmon process events with command lines, password hidden](screenshots/wz06-commands.png)
+
+The first is an attachment download (ATT&CK T1566.001), the second creates a local account (T1136.001), and the Run key and Startup folder are persistence (T1547.001).
+
+```mermaid
+flowchart TD
+    A[21:59:30 PowerShell downloads test attachment] --> B[21:59:32 net commands create art-test]
+    B --> C[art-test added to Administrators]
+    C --> D[21:59:36 encoded payload run from registry]
+    D --> E[21:59:38 Run key persistence]
+    E --> F[21:59:41 batstartup.bat in Startup folder]
+```
+
+### 2. The account chain
+..
 
 ## What I learned
 (...)
