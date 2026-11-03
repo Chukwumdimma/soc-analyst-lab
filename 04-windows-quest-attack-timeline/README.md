@@ -75,3 +75,9 @@ The `art-test` account, the "Atomic Red Team" names, the `T1053_005` task names 
 - **Lesson:** Trust the log over the hint, and write down the mismatch.
   
 ## What I learned
+
+- One session can produce several log entries, and measuring from the wrong one gives the wrong answer.
+- Attackers stack persistence methods, so finding one doesn't mean you've found them all.
+- Command-line logging showed exactly what ran. Without it I'd only know that accounts and files had changed.
+- A rule label like "possible pass-the-hash" is a flag to check, not a conclusion.
+- I'm still learning, and working through the timeline taught me more than reading about these techniques.
