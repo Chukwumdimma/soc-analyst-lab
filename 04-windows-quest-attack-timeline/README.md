@@ -64,5 +64,14 @@ The `art-test` account, the "Atomic Red Team" names, the `T1053_005` task names 
 
 ## Problems and how I fixed them
 
+### 1. My elapsed time was wrong twice
+- **Problem:** I measured from the RDP logon alert, and my answers were rejected.
+- **Fix:** One remote session left several alerts. Two "successful remote logon" alerts came earlier than the one I used. Measuring from the earliest gave the right number.
+- **Lesson:** One event can leave several records, so find the earliest.
 
+### 2. A hint that didn't match the data
+- **Problem:** The task hinted at a value with three letters, but the Run key value was `Atomic Red Team`.
+- **Fix:** I read the registry command itself, `REG ADD ... /V "Atomic Red Team"`, and went with the evidence.
+- **Lesson:** Trust the log over the hint, and write down the mismatch.
+  
 ## What I learned
