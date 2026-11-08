@@ -53,7 +53,59 @@ flowchart TD
 ```
 
 ### 2. The account chain
-..
+Three `net` commands ran within about 90 ms: create the account, set a password, add it to Administrators. Wazuh's account alerts (Event IDs 4720 and 4732) show the result about half a second later. The password was typed on the command line, so the log holds it in plain text. It is `<redacted>` here.
+
+![Account and group change alerts in order](screenshots/wz04-account-chain.png)
+
+### 3. Evidence it was a test
+The account name `art-test`, the registry names containing "Atomic Red Team", the marker file text, and the GitHub address `redcanaryco/atomic-red-team` all point to Atomic Red Team, a free toolkit for testing detections. So this was a simulated attack and not a real compromise.
+
+### 4. The 32 high-severity "executable dropped" alerts were mostly noise
+I read every file path. They split into three groups:
+
+| Group | Count | What it is |
+|---|---|---|
+| `__PSScriptPolicyTest_...ps1` | 11 | Files PowerShell creates itself to test script policy |
+| `.dll` and `.cmdline` pairs in random Temp folders | 9 | Three sets of three files |
+| `powershell-yaml` module files | 12 | A PowerShell module being loaded, twice |
+
+All were written by the normal `powershell.exe` under the Administrator account. They were level 15 because of the folder they landed in, and not because of what the files were.
+
+![Executable dropped alerts with file paths](screenshots/wz05-file-paths.png)
+
+### 5. The 7 CVE alerts are a separate story
+They came from the Linux host, at 08:15, and say the `linux-aws` kernel package has known vulnerabilities. That's a patching note and isn't connected to the Windows activity.
+
+### 6. SSH password guessing on the Linux host
+Searching `rule.groups: authentication_failed` returned 411 alerts (the dashboard card showed 434, which probably counts a broader set of rules). Most were SSH attempts against accounts that don't exist, so they couldn't succeed. Three sources stood out, and none behaved like a person:
+
+| Source | When | How long | Style |
+|---|---|---|---|
+| `203.192.236.x` | Sep 3, about 07:48 to 08:02 | about 14 minutes | Slow and steady, common names like `pi`, `test`, `admin` |
+| `85.85.196.x` | Sep 3, about 21:16 | about 30 seconds | A new attempt every couple of seconds, names like `oracle`, `sa`, `dockeradmin` |
+| `220.167.103.x` | Sep 2, 21:40 | under half a second | A burst of a dozen names at once, like `minecraft`, `vyos`, `deploy` |
+
+![SSH failures with source address and username](screenshots/wz07-ssh-failures.png)
+
+![Top source addresses](screenshots/wz08-top-sources.png)
+
+Rule 5758 ("maximum authentication attempts exceeded") shows SSH cutting the connection off after too many tries. This matches password guessing (ATT&CK T1110). I haven't looked up who owns the addresses, so I can't say who is behind it.
+
+### 7. Successful logins
+`rule.groups: authentication_success` returned 86 alerts. 73 were Windows logons on the Windows host, and 13 were on the Linux host: 3 SSH successes (from `10.0.1.13`, `52.5.37.x` and `34.226.207.x`) and 10 PAM session-opened entries for a practice account.
+
+The Windows logons were all logon type 5 (service logons), under accounts like `SYSTEM`, `DWM-2` and `UMFD-2`. Those are accounts Windows uses for its own services and display sessions, so they were the machine running, not people signing in. About 12 came at roughly the same minute each hour, which fits something automatic.
+
+![Successful logins, with logon type and account](screenshots/wz10-successes.png)
+
+I searched for successful logins from the three guessing addresses and got no results.
+
+![Search for successes from the three addresses, no results](screenshots/wz09-success-search.png)
+
+I confirmed the search worked by running `rule.groups: authentication_success` on its own, which returned the 86 successes. So none of the three sources appear in a successful login in this period. That doesn't rule out other addresses, and I only checked these three. I also found no sign that the `220.167.103.x` burst used the practice account's name, so I found no link between that burst and the SSH successes a second later.
+
+434 failures against 86 successes isn't a like-for-like comparison, because the failures I saw were on the Linux host and most of the successes were on the Windows host.
+
 
 ## What I learned
 (...)
