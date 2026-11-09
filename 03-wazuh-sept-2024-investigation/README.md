@@ -106,6 +106,28 @@ I confirmed the search worked by running `rule.groups: authentication_success` o
 
 434 failures against 86 successes isn't a like-for-like comparison, because the failures I saw were on the Linux host and most of the successes were on the Windows host.
 
+## Problems and how I fixed them
+
+### 1. I first read the 32 drops as malware
+- **Problem:** A burst of level 15 "executable dropped" alerts looked serious.
+- **Fix:** I added the file path as a column and read every one. They were PowerShell housekeeping files.
+- **Lesson:** Severity says which alert to read first, and the details say whether it matters.
+
+### 2. My first searches didn't show what caused the account
+- **Problem:** Scanning the list by eye and searching the word `art-test` returned only the account alerts, with no commands.
+- **Fix:** I searched for Sysmon process creation (`data.win.system.eventID:1`) and added the command line columns. That showed the full commands.
+- **Lesson:** One search coming back thin doesn't mean the data isn't there. Try a different angle.
+
+### 3. Rule names can mislead
+- **Problem:** Wazuh labelled `net user art-test /add` as "account discovery", but the command creates an account.
+- **Fix:** I read the command line instead of trusting the rule description.
+- **Lesson:** A rule description is a label, and the command is the evidence.
+
+### 4. An empty search might be a typo
+- **Problem:** The success search returned no results.
+- **Fix:** I ran the broader search on its own first, which returned 86 hits, to confirm the query worked before relying on the empty result.
+- **Lesson:** Check that a search works before trusting a "nothing found".
+
 
 ## What I learned
 (...)
