@@ -130,4 +130,10 @@ I confirmed the search worked by running `rule.groups: authentication_success` o
 
 
 ## What I learned
-(...)
+- 2,642 alerts and 41 high-severity ones came down to one simulated attack sequence, 7 patching notes and a lot of noise.
+- Severity tells me what to read first, and the command lines tell me what happened.
+- Command-line logs can contain passwords typed in plain text, so they need protecting and masking.
+- A logon alert doesn't mean a person logged in. The Windows successes were service logons by the system, and the logon type showed it.
+- Counts from different hosts and rules can't be compared directly, so I check where each number comes from first.
+- The logs showed what ran and when, but not who ran it or why. The Atomic Red Team traces are what let me call it a test.
+- I'm still learning, and reading real alerts taught me more than reading about them.
